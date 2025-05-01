@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.demo.comentoStatistic.dao.RequestMapper">
+    <select id="selectYearMonth" parameterType="string" resultType="YearMonthDto">
+        SELECT #{yearMonth} as yearMonth, COUNT(*) AS TOTCNT
+          FROM (
+            SELECT DISTINCT(user_id) AS user_id
+              FROM statistic.request_info
+             WHERE request_code = 'L'
+               AND SUBSTR(create_date,1,6) = #{yearMonth}
+               ) A
+    </select>
+    <select id="selectYearMonthByDepartment" parameterType="string" resultType="YearMonthDto">
+        SELECT #{yearMonth} as yearMonth, COUNT(*) AS TOTCNT
+          FROM (
+            SELECT A.user_id,B.hr_organ
+              FROM statistic.request_info A
+              LEFT OUTER JOIN statistic.users B
+                ON A.user_id = B.user_id
+             WHERE A.request_code = 'L'
+               AND SUBSTR(A.create_date,1,6) = #{yearMonth}
+               AND B.hr_organ = #{department}
+            GROUP BY A.user_id,B.hr_organ
+               ) A
+    </select>
+</mapper>
